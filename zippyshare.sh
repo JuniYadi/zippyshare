@@ -1,9 +1,9 @@
 #!/bin/bash
 # @Description: zippyshare.com file download script
-# @Author: Live2x
-# @URL: https://github.com/img2tab/zippyshare
-# @Version: 201809100002
-# @Date: 2018-06-27
+# @Author: Juni Yadi
+# @URL: https://github.com/JuniYadi/zippyshare
+# @Version: 201811240156
+# @Date: 2018-11-24
 # @Usage: ./zippyshare.sh url
 
 if [ -z "${1}" ]
@@ -53,8 +53,15 @@ function zippydownload()
 
     if [ -f "${infofile}" ]
     then
-        # Get url algorithm
-        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' )"
+        #Get url algorithm (new methode)
+        fetchpath="/tmp/zippy-dl.txt"
+        dlfetch=$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' > "$fetchpath" )
+        refetcha=$(sed -i "s/a()/1/g;" "$fetchpath")
+        refetchb=$(sed -i "s/b()/2/g;" "$fetchpath")
+        refetchc=$(sed -i "s/c()/3/g;" "$fetchpath")
+        refetchd=$(sed -i "s/ d / 4 /g;" "$fetchpath")
+
+        dlbutton="$( cat "$fetchpath" )"
         if [ -n "${dlbutton}" ]
         then
            algorithm="${dlbutton}"
@@ -64,6 +71,7 @@ function zippydownload()
         fi
 
         a="$( echo $(( ${algorithm} )) )"
+
         # Get ref, server, id
         ref="$( cat "${infofile}" | grep 'property="og:url"' | cut -d'"' -f4 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
 
