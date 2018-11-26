@@ -62,7 +62,6 @@ function zippydownload()
     then
         #Get url algorithm (new methode 26/11/2018)        
         dlfetch=$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' > "$fetchpath" )
-        dlmethodecheck=$( cat "${infofile}" | grep '<span id="omg" class="2" style="display:none;"></span>' )
 
         if [ $( cat "$fetchdlmet" ) == "new" ]; then
             refetcha=$(sed -i "s/a()/1/g;" "$fetchpath")
