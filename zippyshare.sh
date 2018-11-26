@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Juni Yadi
 # @URL: https://github.com/JuniYadi/zippyshare
-# @Version: 201811250735
-# @Date: 2018-11-25
+# @Version: 201811261036
+# @Date: 2018-11-26
 # @Usage: ./zippyshare.sh url
 
 if [ -z "${1}" ]
@@ -19,6 +19,8 @@ function zippydownload()
     prefix="$( echo -n "${url}" | cut -c "11,12,31-38" | sed -e 's/[^a-zA-Z0-9]//g' )"
     cookiefile="/tmp/${prefix}-cookie.tmp"
     infofile="/tmp/${prefix}-info.tmp"
+    fetchpath="/tmp/zippy-dl.txt"
+    fetchdlmet="/tmp/dlmet.txt"
 
     # loop that makes sure the script actually finds a filename
     filename=""
@@ -29,7 +31,16 @@ function zippydownload()
         rm -f "${cookiefile}" 2> /dev/null
         rm -f "${infofile}" 2> /dev/null
         curl -s -c "${cookiefile}" -o "${infofile}" -L "${url}"
-        filename="$( cat "${infofile}" | grep "/d/" | cut -d'/' -f5 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
+
+        filenamecheck=$( cat "${infofile}" | grep '<span id="omg" class="2" style="display:none;"></span>' )
+
+        if [ "$filenamecheck" ]; then
+            filename="$( cat "${infofile}" | grep "/d/" | cut -d'/' -f6 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
+            echo "new" > "$fetchdlmet"
+        else
+            filename="$( cat "${infofile}" | grep "/d/" | cut -d'/' -f5 | cut -d'"' -f1 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
+            echo "old" > "$fetchdlmet"
+        fi
     done
 
     if [ "${retry}" -ge 10 ]
@@ -49,8 +60,21 @@ function zippydownload()
 
     if [ -f "${infofile}" ]
     then
-        # Get url algorithm
-        dlbutton="$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' )"
+        #Get url algorithm (new methode 26/11/2018)        
+        dlfetch=$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' > "$fetchpath" )
+        dlmethodecheck=$( cat "${infofile}" | grep '<span id="omg" class="2" style="display:none;"></span>' )
+
+        if [ $( cat "$fetchdlmet" ) == "new" ]; then
+            refetcha=$(sed -i "s/a()/1/g;" "$fetchpath")
+            refetchb=$(sed -i "s/b()/2/g;" "$fetchpath")
+            refetchc=$(sed -i "s/c()/3/g;" "$fetchpath")
+            refetchd=$(sed -i "s/ d / 4 /g;" "$fetchpath")
+        fi
+
+
+        dlbutton="$( cat "$fetchpath" )"
+        
+
         if [ -n "${dlbutton}" ]
         then
            algorithm="${dlbutton}"
@@ -59,6 +83,7 @@ function zippydownload()
            exit 1
         fi
 
+        
         a="$( echo $(( ${algorithm} )) )"
         # Get ref, server, id
         ref="$( cat "${infofile}" | grep 'property="og:url"' | cut -d'"' -f4 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
