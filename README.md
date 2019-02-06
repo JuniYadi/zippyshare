@@ -1,4 +1,5 @@
-## zippyshare.sh
+## zippyshare.sh (Working For New Methode Zippyshare 02/2019)
+
 ### bash script for downloading zippyshare files
 
 ##### Download single file from zippyshare
@@ -18,7 +19,4 @@
 ```bash
 ./zippyshare.sh https://www3.zippyshare.com/v/CDCi2wVT/file.html
 ```
-
-zippyshare.sh uses `wget` with the `-C` flag, which skips over completed files and attempts to resume partially downloaded files.
-
-### Requirements: `coreutils`, `grep`, `sed`, **`wget`**
+### Requirements: `coreutils`, `curl`, `grep`, `sed`, `bc`
