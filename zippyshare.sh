@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Juni Yadi
 # @URL: https://github.com/JuniYadi/zippyshare
-# @Version: 201902061036
-# @Date: 2019-02-06
+# @Version: 201902242115
+# @Date: 2019-02-24
 # @Usage: ./zippyshare.sh url
 
 if [ -z "${1}" ]
@@ -52,17 +52,25 @@ function zippydownload()
 
     if [ -f "${infofile}" ]
     then
-        #Get url algorithm (new methode 06/02/2019)
-        dlbutton=$( grep 'var a = ' "${infofile}" | tail -1 | cut -d" " -f8 | cut -d";" -f1 )
+
+    	VALUEA=$( grep 'var a = ' "${infofile}" | tail -1 | cut -d" " -f8 | cut -d";" -f1 )
+    	VALUEB=$( grep 'var b = ' "${infofile}" | tail -1 | cut -d" " -f8 | cut -d";" -f1 )
+
+    	MATH=$(( ${VALUEA} / 3))
+
+        READFILE=$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([a-zA-Z0-9].*\)' > "$fetchpath" )
+        CHANGEA=$(sed -i "s/a/$MATH/g;" "$fetchpath")
+        CHANGEA=$(sed -i "s/b/$VALUEB/g;" "$fetchpath")
+
+        dlbutton=$( cat "$fetchpath" | tr -d '\n' | tr -d '\r')
 
         if [ -n "${dlbutton}" ]
         then
-           algorithm=$( echo "($dlbutton * $dlbutton * $dlbutton)+3" | bc )
+           algorithm="$( echo $(( ${dlbutton} )) )"
         else
            echo "could not get zippyshare url algorithm"
            exit 1
         fi
-
         
         # Get ref, server, id
         ref="$( cat "${infofile}" | grep 'property="og:url"' | cut -d'"' -f4 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
