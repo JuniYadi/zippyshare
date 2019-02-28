@@ -2,8 +2,8 @@
 # @Description: zippyshare.com file download script
 # @Author: Juni Yadi
 # @URL: https://github.com/JuniYadi/zippyshare
-# @Version: 201902260912
-# @Date: 2019-02-26
+# @Version: 201902281148
+# @Date: 2019-02-28
 # @Usage: ./zippyshare.sh url
 
 if [ -z "${1}" ]
@@ -53,7 +53,14 @@ function zippydownload()
     if [ -f "${infofile}" ]
     then
 
-        READFILE=$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' > "$fetchpath" )
+        VALUEA=$( grep 'var a = ' "${infofile}" | tail -1 | cut -d" " -f8 | cut -d";" -f1 )
+        VALUEB=$( grep 'var b = ' "${infofile}" | tail -1 | cut -d" " -f8 | cut -d";" -f1 )
+
+        MATH=$(( ${VALUEA} / 3))
+
+        READFILE=$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([a-zA-Z0-9].*\)' > "$fetchpath" )
+        CHANGEA=$(sed -i "s/a/$MATH/g;" "$fetchpath")
+        CHANGEA=$(sed -i "s/b/$VALUEB/g;" "$fetchpath")
 
         dlbutton=$( cat "$fetchpath" | tr -d '\n' | tr -d '\r')
 
