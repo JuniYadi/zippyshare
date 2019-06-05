@@ -90,9 +90,9 @@ function zippydownload()
     agent="Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36"
 
     if [ -f "$filename" ]; then
-        echo "[ERROR] File  Exist : $filename"
+        echo "[ERROR] File  Exist : $filename - ${url}"
     else
-        echo "[INFO] Download File : $filename"
+        echo "[INFO] Download File : $filename - ${url}"
 
         # Start download file
         curl -# -A "${agent}" -e "${ref}" -H "Cookie: JSESSIONID=${jsessionid}" -C - "${dl}" -o "${filename}"
