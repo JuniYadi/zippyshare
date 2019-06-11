@@ -1,4 +1,4 @@
-## zippyshare.sh (Working For New Methode Zippyshare 11/06/2019)
+## zippyshare.sh (Random Algorithm)[https://github.com/JuniYadi/zippyshare/issues/1]
 
 ### bash script for downloading zippyshare files
 
