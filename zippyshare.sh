@@ -2,7 +2,7 @@
 # @Description: zippyshare.com file download script
 # @Author: Juni Yadi
 # @URL: https://github.com/JuniYadi/zippyshare
-# @Version: 201906112013
+# @Version: 201906112027
 # @Date: 2019-06-11
 # @Usage: ./zippyshare.sh url
 
@@ -53,24 +53,31 @@ function zippydownload()
     if [ -f "${infofile}" ]
     then
 
-        VALUEA=$( grep 'var a = ' "${infofile}" | tail -1 | cut -d" " -f8 | cut -d";" -f1 )
-        VALUEB=$( grep 'var b = ' "${infofile}" | tail -1 | cut -d" " -f8 | cut -d";" -f1 )
+        dlbutton=$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([0-9].*\)' )
 
-        MATH=$(( ${VALUEA} / 3))
+        if [ ! -n "${dlbutton}" ]
+        then
+            VALUEA=$( grep 'var a = ' "${infofile}" | tail -1 | cut -d" " -f8 | cut -d";" -f1 )
+            VALUEB=$( grep 'var b = ' "${infofile}" | tail -1 | cut -d" " -f8 | cut -d";" -f1 )
 
-        READFILE=$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([a-zA-Z0-9].*\)' > "$fetchpath" )
-        CHANGEA=$(sed -i "s/a/$MATH/g;" "$fetchpath")
-        CHANGEA=$(sed -i "s/b/$VALUEB/g;" "$fetchpath")
+            MATH=$(( ${VALUEA} / 3))
 
-        dlbutton=$( cat "$fetchpath" | tr -d '\n' | tr -d '\r')
+            READFILE=$( grep 'getElementById..dlbutton...href' "${infofile}" | grep -oE '\([a-zA-Z0-9].*\)' > "$fetchpath" )
+            CHANGEA=$(sed -i "s/a/$MATH/g;" "$fetchpath")
+            CHANGEA=$(sed -i "s/b/$VALUEB/g;" "$fetchpath")
+
+            dlbutton=$( cat "$fetchpath" | tr -d '\n' | tr -d '\r')
+        fi
 
         if [ -n "${dlbutton}" ]
         then
-           algorithm="$( echo $(( ${dlbutton} )) )"
+            algorithm="$( echo $(( ${dlbutton} )) )"
         else
            echo "could not get zippyshare url algorithm"
            exit 1
         fi
+
+
         
         # Get ref, server, id
         ref="$( cat "${infofile}" | grep 'property="og:url"' | cut -d'"' -f4 | grep -o "[^ ]\+\(\+[^ ]\+\)*" )"
