@@ -1,4 +1,4 @@
-## zippyshare.sh (Working For New Methode Zippyshare 02/2019)
+## zippyshare.sh (Working For New Methode Zippyshare 11/06/2019)
 
 ### bash script for downloading zippyshare files
 
